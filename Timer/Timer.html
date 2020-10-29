@@ -1,11 +1,101 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet" />
     <title>Timer</title>
+
+    <style>
+        #testStartBtn {
+            width: 90px;
+            height: 35px;
+            color: #91e374;
+            background: none;
+            border: 1px solid #91e374;
+            cursor: pointer;
+        }
+
+        #testStopBtn {
+            width: 90px;
+            height: 35px;
+            color: #fff;
+            background: none;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        #wrapper {
+            box-sizing: border-box;
+            width: 300px;
+            height: auto;
+            margin: auto;
+            padding-top: 70px;
+            background: #000;
+            text-align: center;
+        }
+
+        #wrapper {
+            width: 100%;
+            color: #fff;
+            padding-left: 5px;
+        }
+
+        #postTestMin {
+            font-size: 75px;
+            letter-spacing: -2px;
+        }
+
+        #postTestSec {
+            font-size: 75px;
+            letter-spacing: -2px;
+        }
+
+        #postTestMilisec {
+            font-size: 20px;
+            letter-spacing: -1px;
+        }
+
+        #semi {
+            display: inline-block;
+            vertical-align: center;
+            font-size: 55px;
+        }
+
+        #dot {
+            display: inline-block;
+            margin-left: -3px;
+        }
+
+        #testRecordList {
+            color: #fff;
+            list-style: none;
+            text-align: center;
+            padding: 0;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+    </style>
+
+    <script>
+        
+    </script>
 </head>
+
 <body>
-    
+    <div class="container">
+        <div class="title"></div>
+        <h1 class="timestamp">00:00:00</h1>
+        <div class="record_column">
+            <ul class="record-list"></ul>
+        </div>
+        <div class="btn_column">
+            <input type="button" value="랩" class="lab-btn"/>
+            <input type="button" value="시작" class="start-btn"/>
+        </div>
+    </div>
 </body>
+
 </html>
