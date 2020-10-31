@@ -78,13 +78,56 @@
             overflow-y: auto;
         }
     </style>
-
-    <script>
-        
-    </script>
 </head>
 
 <body>
+
+    <script>
+        const timeStamp = document.querySelector("timestamp");
+        const recordList = document.querySelector("record-list");
+        const startBtn = document.querySelector("start-btn");
+        const labBtn = document.querySelector("lab-btn");
+
+        let minutes = 0;
+        let seconds = 0;
+        let milisecs = 0;
+        let counts = 0;
+        let timer;
+
+        function countTimes() {
+            if (startBtn.value == "시작") {
+                startBtn.value = "중단";
+                startBtn.className = "stop-btn";
+                labBtn.value = "랩";
+                labBtn.className = "lab-btn";
+                timer = setInterval(function () {
+                    count += 1;
+                    minutes = Math.floor(count / 6000);
+                    let rest1 = count % 6000;
+                    seconds = Math.floor(rest1 / 100);
+                    let rest2 = rest1 % 100;
+                    milisecs = rest2;
+                    ClockPaint();
+                }, 10);
+            }else if(startBtn.value == "중단"){
+                clearInterval(timer);
+                startBtn.value = "시작";
+                startBtn.className = "start-btn";
+                labBtn.value = "재설정";
+                labBtn.className = "reset-btn";
+            }
+        }
+
+        window.onload =  function init() {
+            startBtn.addEventListener("click", countTimes);
+        }
+
+        function ClockPaint() {
+            timeStamp.innerText =
+                '${minutes < 10 ? "0" + minutes : minutes} : ${seconds < 10 ? "0" + seconds:seconds}:${milisec < 10 ? "0" + milisec : millisec}';
+        }
+    </script>
+
     <div class="container">
         <div class="title"></div>
         <h1 class="timestamp">00:00:00</h1>
@@ -92,8 +135,8 @@
             <ul class="record-list"></ul>
         </div>
         <div class="btn_column">
-            <input type="button" value="랩" class="lab-btn"/>
-            <input type="button" value="시작" class="start-btn"/>
+            <input type="button" value="랩" class="lab-btn" />
+            <input type="button" value="시작" class="start-btn" />
         </div>
     </div>
 </body>
