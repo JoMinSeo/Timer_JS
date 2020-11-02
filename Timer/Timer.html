@@ -8,137 +8,126 @@
     <title>Timer</title>
 
     <style>
-        #testStartBtn {
-            width: 90px;
-            height: 35px;
-            color: #91e374;
-            background: none;
-            border: 1px solid #91e374;
-            cursor: pointer;
-        }
-
-        #testStopBtn {
-            width: 90px;
-            height: 35px;
-            color: #fff;
-            background: none;
-            border: 1px solid #ccc;
-            cursor: pointer;
-            margin-left: 10px;
-        }
-
-        #wrapper {
-            box-sizing: border-box;
-            width: 300px;
-            height: auto;
-            margin: auto;
-            padding-top: 70px;
-            background: #000;
-            text-align: center;
-        }
-
-        #wrapper {
-            width: 100%;
-            color: #fff;
-            padding-left: 5px;
-        }
-
-        #postTestMin {
-            font-size: 75px;
-            letter-spacing: -2px;
-        }
-
-        #postTestSec {
-            font-size: 75px;
-            letter-spacing: -2px;
-        }
-
-        #postTestMilisec {
-            font-size: 20px;
-            letter-spacing: -1px;
-        }
-
-        #semi {
-            display: inline-block;
-            vertical-align: center;
-            font-size: 55px;
-        }
-
-        #dot {
-            display: inline-block;
-            margin-left: -3px;
-        }
-
-        #testRecordList {
-            color: #fff;
-            list-style: none;
-            text-align: center;
+        * {
+            margin: 0;
             padding: 0;
-            max-height: 100px;
-            overflow-y: auto;
+            box-sizing: border-box;
+            font-family: 'Noto Sans KR' !important;
+        }
+
+        body {
+            overflow: hidden;
+            background-color: #F2F2F2;
+        }
+
+        .title {
+            font-size: 52px;
+            color: #404040;
+        }
+
+        .root {
+            height: 100vh;
+            display: flex;
+            display: -webkit-flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .timer-wraper {
+            width: 500px;
+            height: 200px;
+            border: 1px solid black;
+            color: #404040;
+            font-size: 100px;
+            display: flex;
+            display: -webkit-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .timer-parent-wrapper {
+            display: flex;
+            display: -webkit-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-list {
+            display: flex;
+            display: -webkit-flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .cotent-wrapper {
+            display: flex;
+            display: -webkit-flex;
+            flex-direction: column;
+            -ms-flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .Timer-CountWrapper {
+            display: flex;
+            display: -webkit-flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .btn-list>* {
+            margin-right: 5px;
+            border: none;
+            outline: none;
+            color: white;
+            padding: 10px 0;
+            font-size: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 150px;
+        }
+
+        #btn-list-lab {
+            background-color: #F22233;
+        }
+
+        #btn-list-start {
+            background-color: #3098D9;
+        }
+
+        .record-column {
+            margin-top: 10px;
+            background-color: black;
+            width: 100%;
+            color: white;
+            font-size: 20px;
+            padding: 10px;
         }
     </style>
+
 </head>
 
-<body>
+<div class="root">
+    <div class="title">스톱워치</div>
+    <div class="timer-parent-wrapper">
+        <div class="content-wrapper">
+            <div class="timer-wraper">
+                <div id="currentTimer">00:00:00</div>
+            </div>
 
-    <script>
-        const timeStamp = document.querySelector("timestamp");
-        const recordList = document.querySelector("record-list");
-        const startBtn = document.querySelector("start-btn");
-        const labBtn = document.querySelector("lab-btn");
-
-        let minutes = 0;
-        let seconds = 0;
-        let milisecs = 0;
-        let counts = 0;
-        let timer;
-
-        function countTimes() {
-            if (startBtn.value == "시작") {
-                startBtn.value = "중단";
-                startBtn.className = "stop-btn";
-                labBtn.value = "랩";
-                labBtn.className = "lab-btn";
-                timer = setInterval(function () {
-                    count += 1;
-                    minutes = Math.floor(count / 6000);
-                    let rest1 = count % 6000;
-                    seconds = Math.floor(rest1 / 100);
-                    let rest2 = rest1 % 100;
-                    milisecs = rest2;
-                    ClockPaint();
-                }, 10);
-            }else if(startBtn.value == "중단"){
-                clearInterval(timer);
-                startBtn.value = "시작";
-                startBtn.className = "start-btn";
-                labBtn.value = "재설정";
-                labBtn.className = "reset-btn";
-            }
-        }
-
-        window.onload =  function init() {
-            startBtn.addEventListener("click", countTimes);
-        }
-
-        function ClockPaint() {
-            timeStamp.innerText =
-                '${minutes < 10 ? "0" + minutes : minutes} : ${seconds < 10 ? "0" + seconds:seconds}:${milisec < 10 ? "0" + milisec : millisec}';
-        }
-    </script>
-
-    <div class="container">
-        <div class="title"></div>
-        <h1 class="timestamp">00:00:00</h1>
-        <div class="record_column">
-            <ul class="record-list"></ul>
+            <div class="btn-list">
+                <button id="btn-list-lab">랩</button>
+                <button id="btn-list-start">시작</button>
+            </div>
         </div>
-        <div class="btn_column">
-            <input type="button" value="랩" class="lab-btn" />
-            <input type="button" value="시작" class="start-btn" />
+        <div class="record-column">
+            <ul class="timer-record-list" id="record-list">
+
+            </ul>
         </div>
     </div>
+</div>
 </body>
 
 </html>
