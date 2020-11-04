@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
     <title>Timer</title>
 
     <style>
@@ -12,15 +12,17 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Noto Sans KR' !important;
+            font-family: 'Montserrat' !important;
         }
 
         body {
+            min-height: 100vh;
             overflow: hidden;
             background-color: #F2F2F2;
         }
 
         .title {
+            text-align: center;
             font-size: 52px;
             color: #404040;
         }
@@ -45,8 +47,8 @@
         }
 
         .timer-parent-wrapper {
-            display: flex;
-            display: -webkit-flex;
+            /* display: flex;
+            display: -webkit-flex; */
             justify-content: center;
             align-items: center;
         }
@@ -55,7 +57,8 @@
             display: flex;
             display: -webkit-flex;
             align-items: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
+            margin-top: 12px;
         }
 
         .content-wrapper {
@@ -74,11 +77,11 @@
             align-items: center;
         }
 
-        .btn-list >* {
+        .btn-list>* {
             margin-right: 10px;
             border: none;
             outline: none;
-            color: white;
+            color: #0D0D0D;
             padding: 10px 0;
             font-size: 20px;
             border-radius: 10px;
@@ -87,18 +90,33 @@
         }
 
         #btn-list-lab {
-            background-color: #F22233;
+            background-color: #f22233;
+            box-shadow: 0px 0px 8px 3px#D9D9D9;
         }
 
         #btn-list-start {
             background-color: #3098D9;
+            box-shadow: 0px 0px 8px 3px#D9D9D9;
         }
 
-        .record-column {
+        .lab-list {
             margin-top: 10px;
-            background-color: black;
-            width: 100%;
-            color: white;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0px 0px 8px 3px#D9D9D9;
+            width: 30%;
+            color: #404040;
+            font-size: 20px;
+            padding: 10px;
+        }
+
+        .RecordWrapper {
+            margin-top: 10px;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0px 0px 8px 3px#D9D9D9;
+            width: 30%;
+            color: #404040;
             font-size: 20px;
             padding: 10px;
         }
@@ -106,25 +124,49 @@
 
 </head>
 
-<div class="root">
-    <div class="title">스톱워치</div>
-    <div class="timer-parent-wrapper">
-        <div class="content-wrapper">
-            <div class="timer-wraper">
-                <div id="currentTimer">00:00:00</div>
-            </div>
-            <div class="btn-list">
-                <button id="btn-list-lab">랩</button>
-                <button id="btn-list-start">시작</button>
+<body>
+
+    <div class="root">
+        <div class="timer-parent-wrapper">
+            <div class="title">S T O P W A T C H</div>
+            <div class="content-wrapper">
+                <div class="timer-wraper">
+                    <div id="currentTimer">00:00:00</div>
+                </div>
+                <div class="btn-list">
+                    <button id="btn-list-lab">L A B</button>
+                    <button id="btn-list-start">S T A R T</button>
+                </div>
             </div>
         </div>
-        <div class="record-column">
+
+        <div class="lab-list">
+            <h4>L A B L I S T</h4>
             <ul class="timer-record-list" id="record-list">
 
             </ul>
         </div>
+
+        <div class="RecordWrapper">
+            <div id="minRecord">M I N</div>
+            <div id="maxRecord">M A X</div>
+            <div id="averageRecord">AVERAGE</div>
+        </div>
     </div>
-</div>
+
+    <script>
+        const currentTimer = document.getElementById('currentTimer');
+        const startStop = document.getElementById('btn-list-start');
+        const lab = document.getElementById('btn-list-lab');
+        const recordList = document.getElementById('timer-record-list');
+
+        const minRecord = document.getElementById('minRecord');
+        const maxRecord = document.getElementById('maxRecord');
+        const averageRecord = document.getElementById('averageRecord');
+
+        let timeInterval = null;
+    </script>
+
 </body>
 
 </html>
