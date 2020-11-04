@@ -104,7 +104,7 @@
             border-radius: 5px;
             background-color: white;
             box-shadow: 0px 0px 8px 3px#D9D9D9;
-            width: 30%;
+            width: 40%;
             color: #404040;
             font-size: 20px;
             padding: 10px;
@@ -115,7 +115,7 @@
             border-radius: 5px;
             background-color: white;
             box-shadow: 0px 0px 8px 3px#D9D9D9;
-            width: 30%;
+            width: 40%;
             color: #404040;
             font-size: 20px;
             padding: 10px;
@@ -134,15 +134,15 @@
                     <div id="currentTimer">00:00:00</div>
                 </div>
                 <div class="btn-list">
-                    <button id="btn-list-lab">L A B</button>
-                    <button id="btn-list-start">S T A R T</button>
+                    <button id="btn-list-lab" onclick="saveRecordLog();">L A B</button>
+                    <button id="btn-list-start" onclick="clickStartStop();">S T A R T</button>
                 </div>
             </div>
         </div>
 
         <div class="lab-list">
             <h4>L A B L I S T</h4>
-            <ul class="timer-record-list" id="record-list">
+            <ul id="record-list" class="timer-record-list" >
 
             </ul>
         </div>
@@ -158,13 +158,126 @@
         const currentTimer = document.getElementById('currentTimer');
         const startStop = document.getElementById('btn-list-start');
         const lab = document.getElementById('btn-list-lab');
-        const recordList = document.getElementById('timer-record-list');
+        const recordList = document.getElementById('record-list');
 
         const minRecord = document.getElementById('minRecord');
         const maxRecord = document.getElementById('maxRecord');
         const averageRecord = document.getElementById('averageRecord');
 
         let timeInterval = null;
+
+        let isClick = false;
+        let minutes = 0;
+        let seconds = 0;
+        let milliSeconds = 0;
+
+        const resetRecord = () => {
+            averageRecord.innerHTML = '';
+            minRecord.innerHTML = '';
+            maxRecord.innerHTML = '';
+        }
+
+        const resetTimer = () => {
+            while (recordList.firstChild) {
+                recordList.removeChild(recordList.firstChild);
+            }
+
+            minutes = 0;
+            seconds = 0;
+            milliSeconds = 0;
+
+            currentTimer.innerHTML =
+                `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}:${milliSeconds < 10 ? '0' + milliSeconds : milliSeconds}`;
+            resetRecord();
+        }
+
+        const saveRecordLog = () => {
+            console.log(isClick);
+            if (!minutes && !seconds && !milliSeconds) {
+                return;
+            }
+
+            if (!isClick) {
+                console.log(isClick);
+                resetTimer();
+                return;
+            }
+
+            const logContent =
+                `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}:${milliSeconds < 10 ? '0' + milliSeconds : milliSeconds}`;
+            const liTag = document.createElement('li');
+            liTag.append(logContent);
+            recordList.append(liTag);
+        }
+
+        const calculateRecord = () => {
+            let averageMinute = 0;
+            let averageSecond = 0;
+            let averageMilliSecond = 0;
+            let totalSum = 0;
+
+            const childLength = recordList.children.length;
+            const splitMinTime = recordList.children[0].innerHTML.split(":");
+            const splitMaxTime = recordList.children[childLength - 1].innerHTML.split(":");
+
+            for (let i = 0; i < childLength; i++) {
+                // 0번째: 분, 1번째: 초, 2번째: 밀리세컨드
+                const splitTime = recordList.children[i].innerHTML.split(":");
+
+                averageMinute += Number(splitTime[0] * 6000);
+                averageSecond += Number(splitTime[1] * 100);
+                averageMilliSecond += Number(splitTime[2]);
+            }
+
+            totalSum += (averageMilliSecond + averageSecond + averageMinute);
+            totalSum /= childLength;
+
+            // 밀리세컨드에서 뺄때 임시 초 저장 변수
+            let tempSecond = parseInt(totalSum / 100);
+
+            averageMinute = parseInt(totalSum / 6000);
+
+            // 분단위 되면 61초 62초 63초 이런식으로 늘어나서 60*분 만큼 초를 빼서 맞춤
+            averageSecond = (totalSum / 100) <= 60 ? parseInt(totalSum / 100) : parseInt(totalSum / 100) - (60 *
+                averageMinute);
+            averageMilliSecond = parseInt(totalSum - (tempSecond * 100));
+
+            minRecord.innerHTML = `M I N: ${splitMinTime[0]} Min ${splitMinTime[1]} Sec ${splitMinTime[2]} MiliSeconds`;
+            maxRecord.innerHTML = `M A X: ${splitMaxTime[0]} Min ${splitMaxTime[1]} Sec ${splitMaxTime[2]} MiliSeconds`;
+            averageRecord.innerHTML = `AVERAGE: ${averageMinute} Min ${averageSecond} Sec ${averageMilliSecond} MiliSeconds`;
+        }
+
+        const clickStartStop = () => {
+            isClick = !isClick;
+
+            if (!isClick) {
+                clearInterval(timeInterval);
+
+                // 콘솔 에러 방지
+                if (recordList.children.length > 0) {
+                    calculateRecord();
+                }
+            } else {
+                resetRecord();
+                timeInterval = setInterval(() => {
+                    if (isClick) {
+                        milliSeconds++;
+
+                        if (milliSeconds >= 100) {
+                            seconds++;
+                            milliSeconds = 0;
+
+                            if (seconds >= 60) {
+                                seconds = 0;
+                                minutes++;
+                            }
+                        }
+                        currentTimer.innerHTML =
+                            `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}:${milliSeconds < 10 ? '0' + milliSeconds : milliSeconds}`;
+                    }
+                }, 10);
+            }
+        };
     </script>
 
 </body>
