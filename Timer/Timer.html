@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@500&display=swap" rel="stylesheet">
+
+
     <title>Timer</title>
 
     <style>
@@ -13,7 +15,6 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Montserrat' !important;
         }
 
         body {
@@ -23,12 +24,14 @@
         }
 
         .title {
+            font-family: 'Montserrat';
             text-align: center;
             font-size: 52px;
             color: #404040;
         }
 
         .root {
+            font-family: 'Montserrat';
             height: 100vh;
             display: flex;
             display: -webkit-flex;
@@ -38,7 +41,7 @@
         }
 
         .timer-wraper {
-            font-family: 'Noto Sans KR',  !important;
+            font-family: 'Noto Sans KR', sans-serif !important;
             width: 400px;
             color: #404040;
             font-size: 100px;
@@ -56,6 +59,7 @@
         }
 
         .btn-list {
+            font-family: 'Montserrat';
             display: flex;
             display: -webkit-flex;
             align-items: center;
@@ -64,6 +68,7 @@
         }
 
         .content-wrapper {
+            font-family: 'Montserrat';
             display: flex;
             display: -webkit-flex;
             flex-direction: column;
@@ -73,6 +78,7 @@
         }
 
         .Timer-CountWrapper {
+            font-family: 'Montserrat';
             display: flex;
             display: -webkit-flex;
             justify-content: center;
@@ -80,6 +86,7 @@
         }
 
         .btn-list>* {
+            font-family: 'Montserrat';
             margin-right: 10px;
             border: none;
             outline: none;
@@ -102,6 +109,7 @@
         }
 
         .lab-list {
+            font-family: 'Montserrat';
             height: 200px;
             overflow: auto;
             margin-top: 10px;
@@ -115,6 +123,7 @@
         }
 
         .RecordWrapper {
+            font-family: 'Montserrat';
             margin-top: 10px;
             border-radius: 5px;
             background-color: white;
@@ -156,9 +165,9 @@
         </div>
 
         <div class="RecordWrapper">
-            <div id="minRecord">M I N</div>
-            <div id="maxRecord">M A X</div>
-            <div id="averageRecord">AVERAGE</div>
+            <div id="minLap">M I N:</div>
+            <div id="maxLap">M A X:</div>
+            <div id="averageLap">AVERAGE:</div>
         </div>
     </div>
 
@@ -172,9 +181,9 @@
         const second = document.getElementById('seconds');
         const milliSecond = document.getElementById('milliseconds');
 
-        const minRecord = document.getElementById('minRecord');
-        const maxRecord = document.getElementById('maxRecord');
-        const averageRecord = document.getElementById('averageRecord');
+        const minLap = document.getElementById('minLap');
+        const maxLap = document.getElementById('maxLap');
+        const averageLap = document.getElementById('averageLap');
 
         let timeInterval;
         let isClick = false;
@@ -193,6 +202,13 @@
 
         const digitJudgment = (time) => {
             return time < 10 ? "0" + time : "" + time;
+        }
+
+        const resetRecordText = () => {
+            averageRecord.innerHTML = 'AVERAGE:';
+            minRecord.innerHTML = 'M I N:';
+            maxRecord.innerHTML = 'M A X:';
+            description.innerHTML = '정지 버튼을 누르면 계산된 기록이 보입니다.'
         }
 
         const notifyStartStop = () => {
@@ -215,11 +231,12 @@
             TimerStartTime = 0;
             TimerEndTime = 0;
             newTime = new Date();
+            
 
             while (recordList.firstChild) {
                 recordList.removeChild(recordList.firstChild);
             }
-
+            resetRecordText();
             minute.innerText = "00";
             second.innerText = "00";
             milliSecond.innerText = "00";
@@ -245,6 +262,9 @@
         }
 
         const stopTimer = () => {
+            if (recordList.children.length > 0) {
+                calculateRecord();
+            }
             clearInterval(timeInterval);
             timeInterval = null;
             endTime = Date.now();
@@ -260,6 +280,50 @@
             liTag.append(logContent);
             recordList.append(liTag);
         };
+
+        const calculateRecord = () => {
+            let averMinute = 0;
+            let averSecond = 0;
+            let averMilliSecond = 0;
+            let Sum = 0;
+
+            const childLength = recordList.children.length;
+            const MinTime = recordList.children[0].innerHTML.split(":");
+            const MaxTime = recordList.children[childLength - 1].innerHTML.split(":");
+
+            for (let i = 0; i < childLength; i++) {
+                const Time = recordList.children[i].innerHTML.split(":");
+
+                averMinute += Number(Time[0] * 6000);
+                averSecond += Number(Time[1] * 100);
+                averMilliSecond += Number(Time[2]);
+            }
+
+            Sum += (averMilliSecond + averSecond + averMinute);
+            Sum /= childLength;
+
+            // 밀리세컨드에서 뺄때 임시 초 저장 변수
+            let tempSecond = parseInt(Sum / 100);
+
+            averMinute = parseInt(Sum / 6000);
+
+            // 분단위 되면 61초 62초 63초 이런식으로 늘어나서 60*분 만큼 초를 빼서 맞춤
+            averSecond = (Sum / 100) <= 60 ? parseInt(Sum / 100) : parseInt(Sum / 100) - (60 *
+                averMinute);
+            averMilliSecond = parseInt(Sum - (tempSecond * 100));
+
+            minLap.innerHTML = `M I N: ${timeFormat(MinTime[0], MinTime[1], MinTime[2])}`;
+            maxLap.innerHTML = `M A X: ${timeFormat(MaxTime[0], MaxTime[1], MaxTime[2])}`;
+            averageLap.innerHTML = `AVERAGE: ${timeFormat(averMinute, averSecond, averMilliSecond)}`;
+        }
+
+        const timeFormat = (min, sec, milliSec) => {
+            const minutes = Number(min);
+            const seconds = Number(sec);
+            const milliSeconds = Number(milliSec);
+
+            return `${minutes > 0 && minutes < 10 ? '0' + minutes : minutes}분 ${seconds < 10 ? '0' + seconds : seconds}초 ${milliSeconds < 10 ? '0' + milliSeconds : milliSeconds} 밀리세컨드`;
+        }
     </script>
 
 </body>
