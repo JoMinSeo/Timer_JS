@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@900&display=swap" rel="stylesheet">
     <title>Timer</title>
 
     <style>
@@ -37,7 +38,8 @@
         }
 
         .timer-wraper {
-            width: 500px;
+            font-family: 'Noto Sans KR',  !important;
+            width: 400px;
             color: #404040;
             font-size: 100px;
             display: flex;
@@ -100,6 +102,8 @@
         }
 
         .lab-list {
+            height: 200px;
+            overflow: auto;
             margin-top: 10px;
             border-radius: 5px;
             background-color: white;
@@ -131,18 +135,22 @@
             <div class="title">S T O P W A T C H</div>
             <div class="content-wrapper">
                 <div class="timer-wraper">
-                    <div id="currentTimer">00:00:00</div>
+                    <span id="minutes">00</span>
+                    <span>:</span>
+                    <span id="seconds">00</span>
+                    <span>:</span>
+                    <span id="milliseconds">00</span>
                 </div>
                 <div class="btn-list">
-                    <button id="btn-list-lab" onclick="saveRecordLog();">L A B</button>
-                    <button id="btn-list-start" onclick="clickStartStop();">S T A R T</button>
+                    <button id="btn-list-lab" onclick="notifyResetRecord()">L A B</button>
+                    <button id="btn-list-start" onclick="notifyStartStop();">S T A R T</button>
                 </div>
             </div>
         </div>
 
         <div class="lab-list">
             <h4>L A B L I S T</h4>
-            <ul id="record-list" class="timer-record-list" >
+            <ul id="record-list" class="timer-record-list">
 
             </ul>
         </div>
@@ -160,123 +168,97 @@
         const lab = document.getElementById('btn-list-lab');
         const recordList = document.getElementById('record-list');
 
+        const minute = document.getElementById('minutes');
+        const second = document.getElementById('seconds');
+        const milliSecond = document.getElementById('milliseconds');
+
         const minRecord = document.getElementById('minRecord');
         const maxRecord = document.getElementById('maxRecord');
         const averageRecord = document.getElementById('averageRecord');
 
-        let timeInterval = null;
-
+        let timeInterval;
         let isClick = false;
-        let minutes = 0;
-        let seconds = 0;
-        let milliSeconds = 0;
+        let TimerStartTime = 0;
+        let TimerEndTime = 0;
+        let newTime;
 
-        const resetRecord = () => {
-            averageRecord.innerHTML = '';
-            minRecord.innerHTML = '';
-            maxRecord.innerHTML = '';
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "a") {
+                notifyStartStop();
+            }
+            if (e.key === "s") {
+                notifyResetRecord();
+            }
+        });
+
+        const digitJudgment = (time) => {
+            return time < 10 ? "0" + time : "" + time;
         }
 
-        const resetTimer = () => {
+        const notifyStartStop = () => {
+            if (timeInterval) {
+                stopTimer();
+            } else {
+                startTimer();
+            }
+        };
+
+        const notifyResetRecord = () => {
+            if (timeInterval) {
+                Record();
+            } else {
+                reset();
+            }
+        };
+
+        const reset = () => {
+            TimerStartTime = 0;
+            TimerEndTime = 0;
+            newTime = new Date();
+
             while (recordList.firstChild) {
                 recordList.removeChild(recordList.firstChild);
             }
 
-            minutes = 0;
-            seconds = 0;
-            milliSeconds = 0;
+            minute.innerText = "00";
+            second.innerText = "00";
+            milliSecond.innerText = "00";
+        };
 
-            currentTimer.innerHTML =
-                `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}:${milliSeconds < 10 ? '0' + milliSeconds : milliSeconds}`;
-            resetRecord();
+        const startTimer = () => {
+            if (TimerStartTime) {
+                TimerStartTime += Date.now() - endTime;
+            } else {
+                TimerStartTime = Date.now();
+            }
+
+            timeInterval = setInterval(() => {
+                newTime = new Date(Date.now() - TimerStartTime);
+
+                minute.innerText = digitJudgment(newTime.getMinutes());
+                second.innerText = digitJudgment(newTime.getSeconds());
+                milliSecond.innerText = digitJudgment(Math.floor(newTime.getMilliseconds() / 10));
+            }, 1);
+
+            startStop.innerText = "S T O P";
+            lab.innerText = "R E C O R D";
         }
 
-        const saveRecordLog = () => {
-            console.log(isClick);
-            if (!minutes && !seconds && !milliSeconds) {
-                return;
-            }
+        const stopTimer = () => {
+            clearInterval(timeInterval);
+            timeInterval = null;
+            endTime = Date.now();
 
-            if (!isClick) {
-                console.log(isClick);
-                resetTimer();
-                return;
-            }
+            startStop.innerText = "S T A R T";
+            lab.innerText = "R E S E T";
+        }
 
+        const Record = () => {
             const logContent =
-                `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}:${milliSeconds < 10 ? '0' + milliSeconds : milliSeconds}`;
+                `${digitJudgment(newTime.getMinutes())}:${digitJudgment(newTime.getSeconds())}:${digitJudgment(Math.floor(newTime.getMilliseconds() / 10))}`;
             const liTag = document.createElement('li');
             liTag.append(logContent);
             recordList.append(liTag);
-        }
-
-        const calculateRecord = () => {
-            let averageMinute = 0;
-            let averageSecond = 0;
-            let averageMilliSecond = 0;
-            let totalSum = 0;
-
-            const childLength = recordList.children.length;
-            const splitMinTime = recordList.children[0].innerHTML.split(":");
-            const splitMaxTime = recordList.children[childLength - 1].innerHTML.split(":");
-
-            for (let i = 0; i < childLength; i++) {
-                // 0번째: 분, 1번째: 초, 2번째: 밀리세컨드
-                const splitTime = recordList.children[i].innerHTML.split(":");
-
-                averageMinute += Number(splitTime[0] * 6000);
-                averageSecond += Number(splitTime[1] * 100);
-                averageMilliSecond += Number(splitTime[2]);
-            }
-
-            totalSum += (averageMilliSecond + averageSecond + averageMinute);
-            totalSum /= childLength;
-
-            // 밀리세컨드에서 뺄때 임시 초 저장 변수
-            let tempSecond = parseInt(totalSum / 100);
-
-            averageMinute = parseInt(totalSum / 6000);
-
-            // 분단위 되면 61초 62초 63초 이런식으로 늘어나서 60*분 만큼 초를 빼서 맞춤
-            averageSecond = (totalSum / 100) <= 60 ? parseInt(totalSum / 100) : parseInt(totalSum / 100) - (60 *
-                averageMinute);
-            averageMilliSecond = parseInt(totalSum - (tempSecond * 100));
-
-            minRecord.innerHTML = `M I N: ${splitMinTime[0]} Min ${splitMinTime[1]} Sec ${splitMinTime[2]} MiliSeconds`;
-            maxRecord.innerHTML = `M A X: ${splitMaxTime[0]} Min ${splitMaxTime[1]} Sec ${splitMaxTime[2]} MiliSeconds`;
-            averageRecord.innerHTML = `AVERAGE: ${averageMinute} Min ${averageSecond} Sec ${averageMilliSecond} MiliSeconds`;
-        }
-
-        const clickStartStop = () => {
-            isClick = !isClick;
-
-            if (!isClick) {
-                clearInterval(timeInterval);
-
-                // 콘솔 에러 방지
-                if (recordList.children.length > 0) {
-                    calculateRecord();
-                }
-            } else {
-                resetRecord();
-                timeInterval = setInterval(() => {
-                    if (isClick) {
-                        milliSeconds++;
-
-                        if (milliSeconds >= 100) {
-                            seconds++;
-                            milliSeconds = 0;
-
-                            if (seconds >= 60) {
-                                seconds = 0;
-                                minutes++;
-                            }
-                        }
-                        currentTimer.innerHTML =
-                            `${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}:${milliSeconds < 10 ? '0' + milliSeconds : milliSeconds}`;
-                    }
-                }, 10);
-            }
         };
     </script>
 
